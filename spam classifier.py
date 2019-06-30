@@ -8,22 +8,19 @@ from nltk import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer,WordNetLemmatizer
 from sklearn.feature_extraction.text import CountVectorizer,TfidfVectorizer
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
 from sklearn.metrics import confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from scipy.sparse import hstack,csr_matrix
 from sklearn.svm import SVC
-import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
+
 
 
 
 #import data
 data = pd.read_pickle('spam.pickle')
 data = data[['v2','v1']]
-data = shuffle(data)
-data = data.head(4000)
 
 #drop nan values
 data.dropna(inplace = True)
@@ -57,7 +54,7 @@ for i in range(len(data)):
    
 
 #creating feature matrices
-cv = CountVectorizer(min_df = 5,ngram_range = (1,5),max_features=2000)
+cv = TfidfVectorizer(min_df = 5,ngram_range = (1,5),max_features=2000)
 X = cv.fit_transform(corpus).toarray()
 X = hstack([X, csr_matrix(num_dig).T], 'csr')
 X = hstack([X, csr_matrix(num_non_word).T], 'csr')
@@ -92,25 +89,6 @@ print(clf.score(X_cv,y_cv))
 cm = confusion_matrix(y_cv,y_pred)
 print(cm)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+pickling_on = open("clf.pickle","wb")
+pickle.dump(clf, pickling_on)
+pickling_on.close()
